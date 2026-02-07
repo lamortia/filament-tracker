@@ -38,3 +38,25 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantare
 .modal-card{width:min(720px,100%);background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px}
 label{display:block;margin:10px 0 6px;color:var(--muted);font-size:12px}
 hr{border:0;border-top:1px solid var(--border);margin:12px 0}
+
+/* --- Help blocks (collapsible) --- */
+.help {
+  margin: 10px 0 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+}
+
+.help > summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  user-select: none;
+}
+
+.help > summary::-webkit-details-marker { display: none; }
+
+.help .muted {
+  margin-top: 8px;
+}
