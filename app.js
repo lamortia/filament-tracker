@@ -1,4 +1,38 @@
-/* ===== Backup UI polish wiring (Choose JSON / Import & Replace / Clear / WIPE gate) ===== */
+// ===== FAILSAFE: keep tab navigation working even if other code errors =====
+window.addEventListener("error", (e) => {
+  // Comment this out later if you don’t want popups
+  console.log("App error:", e?.message || e);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  try {
+    const tabs = Array.from(document.querySelectorAll(".tab[data-view]"));
+    const views = Array.from(document.querySelectorAll("main .view"));
+
+    if (!tabs.length || !views.length) return;
+
+    function show(viewName){
+      // tabs
+      tabs.forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
+      // views
+      views.forEach(v => {
+        const id = v.id || "";
+        const isTarget = id === `view-${viewName}`;
+        v.classList.toggle("hidden", !isTarget);
+      });
+    }
+
+    tabs.forEach(t => {
+      t.addEventListener("click", () => show(t.dataset.view));
+    });
+
+    // ensure initial tab matches whatever is marked active
+    const active = tabs.find(t => t.classList.contains("active")) || tabs[0];
+    show(active.dataset.view);
+  } catch (err) {
+    console.log("Failsafe tabs error:", err);
+  }
+});/* ===== Backup UI polish wiring (Choose JSON / Import & Replace / Clear / WIPE gate) ===== */
 (function wireBackupPolish(){
   const importInput = document.getElementById("importFile");
   const pickBtn = document.getElementById("pickJsonBtn");
