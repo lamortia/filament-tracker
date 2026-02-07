@@ -941,6 +941,169 @@ async function renderInsights(){
         el("div",{},[
           el("div",{}, `${fmtMoney(p.perKg)}/kg • final ${fmtMoney(p.finalPrice)} • ${new Date(p.timestamp).toLocaleDateString()}`),
           el("div",{class:"meta"}, s?skuLabel(s):p.filamentSkuId),
+          // --- Backup polish: custom file picker + confirm import + WIPE gate ---
+(function backupPolish(){
+  const importInput = document.getElementById("importFile");
+  const pickBtn = document.getElementById("pickJsonBtn");
+  const importBtn = document.getElementById("importConfirmBtn");
+  const cancelBtn = document.getElementById("importCancelBtn");
+  const fileNameEl = document.getElementById("importFileName");
+
+  const wipeInput = document.getElementById("wipeConfirmInput");
+  const resetBtn = document.getElementById("resetBtn");
+
+  // If any elements are missing, don't crash
+  if(!importInput || !pickBtn || !importBtn || !cancelBtn || !fileNameEl || !wipeInput || !resetBtn) return;
+
+  let pendingFile = null;
+
+  pickBtn.addEventListener("click", () => importInput.click());
+
+  importInput.addEventListener("change", (e) => {
+    const f = e.target.files?.[0] || null;
+    pendingFile = f;
+
+    if(f){
+      fileNameEl.textContent = f.name;
+      importBtn.disabled = false;
+      cancelBtn.disabled = false;
+    }else{
+      fileNameEl.textContent = "No file selected";
+      importBtn.disabled = true;
+      cancelBtn.disabled = true;
+    }
+  });
+
+  cancelBtn.addEventListener("click", () => {
+    pendingFile = null;
+    importInput.value = "";
+    fileNameEl.textContent = "No file selected";
+    importBtn.disabled = true;
+    cancelBtn.disabled = true;
+  });
+
+  // Confirm import (uses the existing modal if present, otherwise confirm())
+  importBtn.addEventListener("click", async () => {
+    if(!pendingFile) return;
+
+    const ok = await confirmBackupAction(
+      "Import & Replace",
+      `This will REPLACE local data on this device with:\n\n${pendingFile.name}\n\nProceed?`
+    );
+
+    if(!ok) return;
+
+    // Trigger the app's existing JSON import flow by reusing the file input.
+    // If your app already has an import listener on #importFile, it will run normally.
+    // If not, we'll run a safe fallback import here.
+    if (!hasImportListener(importInput)) {
+      await fallbackJsonImport(pendingFile);
+    } else {
+      // Re-trigger change event path by ensuring input still holds the file
+      // (most implementations already read from input.files in their handler)
+      importInput.dispatchEvent(new Event("change"));
+    }
+  });
+
+  // WIPE gate (enable reset only when WIPE typed)
+  const setWipeEnabled = () => {
+    const val = (wipeInput.value || "").trim().toUpperCase();
+    resetBtn.disabled = (val !== "WIPE");
+  };
+  wipeInput.addEventListener("input", setWipeEnabled);
+  setWipeEnabled();
+
+  // If your app already has a click handler on #resetBtn, this just gates it.
+  // If not, provide a fallback wipe confirm.
+  resetBtn.addEventListener("click", async () => {
+    const ok = await confirmBackupAction(
+      "Wipe local database",
+      "This will delete ALL local data on this device.\n\nProceed?"
+    );
+    if(!ok) return;
+
+    // If existing reset handler exists, let it run; otherwise fallback.
+    if (!hasClickListener(resetBtn)) {
+      try {
+        localStorage.clear();
+        // IndexedDB wipe fallback (best effort)
+        if (window.indexedDB?.databases) {
+          const dbs = await indexedDB.databases();
+          for (const d of dbs) {
+            if (d?.name) indexedDB.deleteDatabase(d.name);
+          }
+        }
+        location.reload();
+      } catch (e) {
+        console.error(e);
+        alert("Wipe failed. Try clearing site storage in Chrome settings.");
+      }
+    }
+  });
+
+  function hasImportListener(el){
+    // Best-effort: if your code attached a handler, it will still fire.
+    // We can't reliably introspect listeners, so return true to avoid double-import
+    // ONLY if there is a global marker you set. Otherwise false.
+    return !!window.__FT_HAS_IMPORT_HANDLER__;
+  }
+
+  function hasClickListener(el){
+    // Same approach: allow your app's existing handlers to run.
+    return !!window.__FT_HAS_RESET_HANDLER__;
+  }
+
+  async function confirmBackupAction(title, message){
+    const modal = document.getElementById("modal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalBody = document.getElementById("modalBody");
+    const modalClose = document.getElementById("modalClose");
+
+    if(!modal || !modalTitle || !modalBody || !modalClose){
+      return window.confirm(message);
+    }
+
+    return new Promise((resolve) => {
+      modalTitle.textContent = title;
+
+      modalBody.innerHTML = `
+        <div class="muted small" style="white-space:pre-wrap; line-height:1.35;">${escapeHtml(message)}</div>
+        <div class="row gap" style="margin-top:14px; justify-content:flex-end;">
+          <button class="btn subtle" id="__cancel">Cancel</button>
+          <button class="btn danger" id="__ok">Proceed</button>
+        </div>
+      `;
+
+      modal.classList.remove("hidden");
+
+      const cleanup = () => {
+        modal.classList.add("hidden");
+        modalBody.innerHTML = "";
+      };
+
+      modalClose.onclick = () => { cleanup(); resolve(false); };
+      modal.querySelector("#__cancel").onclick = () => { cleanup(); resolve(false); };
+      modal.querySelector("#__ok").onclick = () => { cleanup(); resolve(true); };
+    });
+  }
+
+  async function fallbackJsonImport(file){
+    const text = await file.text();
+    const data = JSON.parse(text);
+    // If your app already has an import function, prefer that.
+    if (typeof window.importBackupJson === "function") {
+      await window.importBackupJson(data);
+      return;
+    }
+    alert("Import handler not found. Your app needs the original JSON import code wired to #importFile.");
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, (c)=>({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[c]));
+  }
+})();
         ])
       ]));
     });
