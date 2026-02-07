@@ -39,6 +39,226 @@
         <button class="btn" id="addSkuBtn">Add SKU</button>
       </div>
 
+      <details class="help">
+        <summary>Help / How to use this tab</summary>
+        <div class="muted small">
+          <strong>What this tab does:</strong> Your master list of filament SKUs (Brand/Line/Material/Color/Finish/Additives).
+          Create SKUs once, then use them everywhere else. Tap <em>Watch</em> on SKUs you want to track for price trends and deal radar.
+          Use search + filters to find items fast.
+        </div>
+      </details>
+
+      <div class="card">
+        <div class="row gap">
+          <input id="skuSearch" class="input grow" placeholder="Search (brand, line, material, color, finish, additives)" />
+          <select id="materialFilter" class="input"></select>
+          <select id="brandFilter" class="input"></select>
+        </div>
+      </div>
+
+      <div id="skuList" class="list"></div>
+    </section>
+
+    <!-- TRENDS -->
+    <section id="view-trends" class="view hidden">
+      <div class="row">
+        <h2>Trends</h2>
+        <div class="grow"></div>
+      </div>
+
+      <details class="help">
+        <summary>Help / How to use this tab</summary>
+        <div class="muted small">
+          <strong>What this tab does:</strong> Track historical pricing for a SKU. Select a watched SKU, then add
+          <em>Price Snapshots</em> (base price, shipping, coupon/discount). The app calculates <strong>$/kg</strong> and keeps a history so you can
+          see if a material/color is trending up or down and spot good deals.
+          <div style="margin-top:8px;">
+            <strong>Tip:</strong> Add snapshots whenever you see a sale. Later phases can automate snapshot pulls from vendor sites.
+          </div>
+        </div>
+      </details>
+
+      <div class="card">
+        <div class="row gap">
+          <select id="trendSkuSelect" class="input grow"></select>
+          <button class="btn" id="addSnapshotBtn">Add Price Snapshot</button>
+        </div>
+        <div class="muted small">Charts come in Phase 1.1 — for now you’ll see snapshots + computed $/kg + simple change stats.</div>
+      </div>
+
+      <div id="snapshotList" class="list"></div>
+    </section>
+
+    <!-- OPS -->
+    <section id="view-ops" class="view hidden">
+      <div class="row">
+        <h2>My Filament</h2>
+        <div class="grow"></div>
+        <button class="btn" id="addPurchaseBtn">Add Purchase</button>
+        <button class="btn" id="addSpoolBtn">Add Spool</button>
+      </div>
+
+      <details class="help">
+        <summary>Help / How to use this tab</summary>
+        <div class="muted small">
+          <strong>What this tab does:</strong> Your operational inventory view.
+          <ul style="margin:8px 0 0 18px;">
+            <li><strong>Watchlist</strong> = SKUs you actively track (price trends + deal radar).</li>
+            <li><strong>Spools</strong> = physical rolls you own (used for depletion tracking).</li>
+            <li><strong>Purchases</strong> = where/when you bought items (tax/shipping/notes).</li>
+          </ul>
+          <div style="margin-top:8px;">
+            When you log print jobs, spool weight will decrement so you can see consumption patterns.
+          </div>
+        </div>
+      </details>
+
+      <div class="grid2">
+        <div class="card">
+          <h3>Watchlist</h3>
+          <div id="watchList" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>Spools</h3>
+          <div id="spoolList" class="list"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Purchases</h3>
+        <div id="purchaseList" class="list"></div>
+      </div>
+    </section>
+
+    <!-- PRINT LOG -->
+    <section id="view-printlog" class="view hidden">
+      <div class="row">
+        <h2>Print Log</h2>
+        <div class="grow"></div>
+        <button class="btn" id="addPrintJobBtn">Log Print Job</button>
+      </div>
+
+      <details class="help">
+        <summary>Help / How to use this tab</summary>
+        <div class="muted small">
+          <strong>What this tab does:</strong> Capture real usage and waste. Log a print job with <em>grams used</em>, outcome (success/fail/partial),
+          and optional <em>scrap grams</em>.
+          <div style="margin-top:8px;">
+            <strong>Best practice:</strong> choose a <em>Spool</em> when logging. The app will decrement remaining grams automatically.
+            This powers Insights (usage + waste hotspots).
+          </div>
+        </div>
+      </details>
+
+      <div class="card">
+        <div class="row gap">
+          <div class="pill">Printer: <strong>Bambu P2S</strong></div>
+          <div class="pill">AMS: <strong>AMS 2 Pro</strong></div>
+          <div class="pill">Defaults: <strong>1.75mm</strong>, <strong>1000g</strong></div>
+        </div>
+      </div>
+
+      <div id="printJobList" class="list"></div>
+    </section>
+
+    <!-- INSIGHTS -->
+    <section id="view-insights" class="view hidden">
+      <div class="row">
+        <h2>Insights</h2>
+        <div class="grow"></div>
+      </div>
+
+      <details class="help">
+        <summary>Help / How to use this tab</summary>
+        <div class="muted small">
+          <strong>What this tab does:</strong> Turn your logs into decisions.
+          <ul style="margin:8px 0 0 18px;">
+            <li><strong>Usage (last 30 days):</strong> top SKUs by grams used (from Print Log).</li>
+            <li><strong>Waste hotspots:</strong> highest scrap % (add scrap grams in Print Log).</li>
+            <li><strong>Deal radar:</strong> watched SKUs ranked by latest <strong>$/kg</strong> (from Trends snapshots).</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="grid2">
+        <div class="card">
+          <h3>Usage (last 30 days)</h3>
+          <div id="usage30" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>Waste Hotspots</h3>
+          <div id="wasteHotspots" class="list"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Deal Radar (latest snapshots)</h3>
+        <div id="dealRadar" class="list"></div>
+      </div>
+    </section>
+
+    <!-- BACKUP -->
+    <section id="view-backup" class="view hidden">
+      <div class="row">
+        <h2>Backup</h2>
+        <div class="grow"></div>
+      </div>
+
+      <details class="help">
+        <summary>Help / How to use this tab</summary>
+        <div class="muted small">
+          <strong>What this tab does:</strong> Protect your data and move between devices.
+          <ul style="margin:8px 0 0 18px;">
+            <li><strong>Export JSON</strong> = full backup (best for restoring or moving phone ↔ PC).</li>
+            <li><strong>Export CSV</strong> = spreadsheet-friendly (snapshots + print jobs).</li>
+            <li><strong>Import JSON</strong> = replaces local data with the backup file.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="card">
+        <h3>Export</h3>
+        <div class="row gap">
+          <button class="btn" id="exportJsonBtn">Export JSON (full backup)</button>
+          <button class="btn" id="exportCsvBtn">Export CSV (snapshots + jobs)</button>
+        </div>
+        <div class="muted small">Use JSON to move between Android ↔ PC until cloud sync (Phase 2).</div>
+      </div>
+
+      <div class="card">
+        <h3>Import</h3>
+        <input type="file" id="importFile" class="input" accept=".json" />
+        <div class="muted small">Importing replaces local data.</div>
+      </div>
+
+      <div class="card danger">
+        <h3>Reset</h3>
+        <div class="muted small">
+          Wipes the local database on this device only. Use this if you want to start fresh.
+        </div>
+        <button class="btn danger" id="resetBtn">Wipe local database</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Dialog">
+    <div class="modal-card">
+      <div class="row">
+        <h3 id="modalTitle">Modal</h3>
+        <div class="grow"></div>
+        <button class="btn subtle" id="modalClose">Close</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>        <div class="grow"></div>
+        <button class="btn" id="seedBtn">Seed materials & colors</button>
+        <button class="btn" id="addSkuBtn">Add SKU</button>
+      </div>
+
       <div class="muted small">
         <strong>What this tab does:</strong> Your master list of filament SKUs (Brand/Line/Material/Color/Finish/Additives).
         Create SKUs once, then use them everywhere else. Tap <em>Watch</em> on SKUs you want to track for
