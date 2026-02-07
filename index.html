@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#111111" />
+  <title>Filament Trends & Ops Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">FT</div>
+      <div>
+        <div class="title">Filament Tracker</div>
+        <div class="subtitle">Local-first PWA (Phase 1)</div>
+      </div>
+    </div>
+    <button id="installBtn" class="btn subtle" hidden>Install</button>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab active" data-view="catalog">Catalog</button>
+    <button class="tab" data-view="trends">Trends</button>
+    <button class="tab" data-view="ops">My Filament</button>
+    <button class="tab" data-view="printlog">Print Log</button>
+    <button class="tab" data-view="insights">Insights</button>
+    <button class="tab" data-view="backup">Backup</button>
+  </nav>
+
+  <main class="container">
+    <section id="view-catalog" class="view">
+      <div class="row">
+        <h2>Catalog</h2>
+        <div class="grow"></div>
+        <button class="btn" id="seedBtn">Seed materials & colors</button>
+        <button class="btn" id="addSkuBtn">Add SKU</button>
+      </div>
+      <div class="card">
+        <div class="row gap">
+          <input id="skuSearch" class="input grow" placeholder="Search (brand, line, material, color, finish, additives)" />
+          <select id="materialFilter" class="input"></select>
+          <select id="brandFilter" class="input"></select>
+        </div>
+      </div>
+      <div id="skuList" class="list"></div>
+    </section>
+
+    <section id="view-trends" class="view hidden">
+      <div class="row">
+        <h2>Trends</h2>
+        <div class="grow"></div>
+      </div>
+      <div class="card">
+        <div class="row gap">
+          <select id="trendSkuSelect" class="input grow"></select>
+          <button class="btn" id="addSnapshotBtn">Add Price Snapshot</button>
+        </div>
+        <div class="muted small">Charts come in Phase 1.1 — for now you’ll see snapshots + computed $/kg + simple change stats.</div>
+      </div>
+      <div id="snapshotList" class="list"></div>
+    </section>
+
+    <section id="view-ops" class="view hidden">
+      <div class="row">
+        <h2>My Filament</h2>
+        <div class="grow"></div>
+        <button class="btn" id="addPurchaseBtn">Add Purchase</button>
+        <button class="btn" id="addSpoolBtn">Add Spool</button>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h3>Watchlist</h3>
+          <div id="watchList" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>Spools</h3>
+          <div id="spoolList" class="list"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Purchases</h3>
+        <div id="purchaseList" class="list"></div>
+      </div>
+    </section>
+
+    <section id="view-printlog" class="view hidden">
+      <div class="row">
+        <h2>Print Log</h2>
+        <div class="grow"></div>
+        <button class="btn" id="addPrintJobBtn">Log Print Job</button>
+      </div>
+      <div class="card">
+        <div class="row gap">
+          <div class="pill">Printer: <strong>Bambu P2S</strong></div>
+          <div class="pill">AMS: <strong>AMS 2 Pro</strong></div>
+          <div class="pill">Defaults: <strong>1.75mm</strong>, <strong>1000g</strong></div>
+        </div>
+      </div>
+      <div id="printJobList" class="list"></div>
+    </section>
+
+    <section id="view-insights" class="view hidden">
+      <div class="row">
+        <h2>Insights</h2>
+        <div class="grow"></div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h3>Usage (last 30 days)</h3>
+          <div id="usage30" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>Waste Hotspots</h3>
+          <div id="wasteHotspots" class="list"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Deal Radar (latest snapshots)</h3>
+        <div id="dealRadar" class="list"></div>
+      </div>
+    </section>
+
+    <section id="view-backup" class="view hidden">
+      <div class="row">
+        <h2>Backup</h2>
+        <div class="grow"></div>
+      </div>
+
+      <div class="card">
+        <h3>Export</h3>
+        <div class="row gap">
+          <button class="btn" id="exportJsonBtn">Export JSON (full backup)</button>
+          <button class="btn" id="exportCsvBtn">Export CSV (snapshots + jobs)</button>
+        </div>
+        <div class="muted small">Use JSON to move between Android ↔ PC until cloud sync (Phase 2).</div>
+      </div>
+
+      <div class="card">
+        <h3>Import</h3>
+        <input type="file" id="importFile" class="input" accept=".json" />
+        <div class="muted small">Importing replaces local data.</div>
+      </div>
+
+      <div class="card danger">
+        <h3>Reset</h3>
+        <button class="btn danger" id="resetBtn">Wipe local database</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Dialog">
+    <div class="modal-card">
+      <div class="row">
+        <h3 id="modalTitle">Modal</h3>
+        <div class="grow"></div>
+        <button class="btn subtle" id="modalClose">Close</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
