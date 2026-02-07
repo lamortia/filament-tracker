@@ -1,4 +1,4 @@
-const CACHE_NAME = "ft-cache-v3";
+const CACHE_NAME = "ft-cache-v9";
 const ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.json"];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache)=>cache.addAll(ASSETS)));
