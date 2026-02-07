@@ -12,9 +12,7 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
   self.skipWaiting();
 });
 
@@ -29,16 +27,12 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
-
-  // Only handle GET
   if (req.method !== "GET") return;
 
   const url = new URL(req.url);
-
-  // Only cache same-origin (your github.io site)
   if (url.origin !== self.location.origin) return;
 
-  // 1) NAVIGATION (HTML): network-first so new deploys show up
+  // Navigation/HTML: network-first
   if (req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html")) {
     event.respondWith(
       fetch(req)
@@ -52,7 +46,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 2) STATIC (CSS/JS/Images): cache-first for speed
+  // Static: cache-first
   event.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;
